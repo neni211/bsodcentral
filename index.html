@@ -5,6 +5,11 @@
 <title>BSOD Central</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2775753189756640"
+     crossorigin="anonymous"></script>
+
+  
 :root{--bg:#cce7ff;--card:#fff;--text:#0f172a}
 body.dark{--bg:#0f172a;--card:#1e293b;--text:#e5e7eb}
 body{margin:0;padding:20px;background:var(--bg);color:var(--text);font-family:Arial, sans-serif;transition:.4s}
@@ -186,4 +191,5 @@ function goToError(code){const details=document.querySelectorAll('details');deta
 function copyError(code){const e=errors.find(err=>err.code===code);if(e){const textToCopy=`${e.code}\n${text[currentLang].reason}: ${e.reason[currentLang]}\n${text[currentLang].solution}: ${e.solution[currentLang]}`;navigator.clipboard.writeText(textToCopy);const msg=document.getElementById('copyMsg');msg.classList.add('show');setTimeout(()=>msg.classList.remove('show'),1500);}}
 </script>
 </body>
+
 </html>
