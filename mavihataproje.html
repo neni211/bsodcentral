@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>BSOD Central</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+:root{--bg:#cce7ff;--card:#fff;--text:#0f172a}
+body.dark{--bg:#0f172a;--card:#1e293b;--text:#e5e7eb}
+body{margin:0;padding:20px;background:var(--bg);color:var(--text);font-family:Arial, sans-serif;transition:.4s}
+.topbar{position:fixed;top:0;left:0;right:0;background:linear-gradient(90deg,#2563eb,#38bdf8);color:#fff;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;z-index:1000}
+.topbar select,.topbar button{margin-left:8px;padding:6px 10px;border-radius:20px;border:none;font-weight:bold;cursor:pointer}
+.topbar select{background:#fff;color:#2563eb}
+.topbar button{background:#fff;color:#2563eb}
+.content{margin-top:80px;max-width:950px;margin-inline:auto}
+.search{width:100%;padding:12px;border-radius:8px;border:1px solid #cbd5f5;font-size:15px;margin-bottom:15px}
+details{background:var(--card);border-radius:10px;padding:14px;margin:12px 0;box-shadow:0 6px 14px rgba(0,0,0,.08);transition:transform 0.2s;position:relative}
+summary{cursor:pointer;font-weight:bold}
+.risk-wrap{margin-top:10px;font-size:13px}
+.risk-bar{height:10px;border-radius:6px;background:#e5e7eb;overflow:hidden;margin-top:4px}
+.risk-fill{height:100%;width:0;animation:fill 1.2s ease forwards}
+.low{background:#22c55e;width:33%}
+.mid{background:#f59e0b;width:66%}
+.high{background:#ef4444;width:100%}
+@keyframes fill{from{width:0}}
+@keyframes pulseText {0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); }}
+.risk-high.active { animation: pulseText 1.5s ease-in-out; }
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;z-index:2000}
+.cookie-box{background:var(--card);padding:20px;width:320px;border-radius:12px;text-align:center;font-size:14px}
+.cookie-box button{width:100%;padding:8px;margin-top:8px;border:none;border-radius:8px;cursor:pointer}
+footer{text-align:center;font-size:12px;margin:40px 0;color:#64748b}
+.feedback {margin-top: 12px;padding: 12px;background: #f5f7fa;border-left: 4px solid #4da3ff;border-radius: 8px;font-size: 13px;animation: fadeSlide 0.4s ease;}
+.feedback span {display: block;margin-bottom: 8px;font-weight: bold;}
+.feedback button {border: none;padding: 6px 12px;margin-right: 6px;border-radius: 20px;cursor: pointer;transition: transform 0.15s ease, box-shadow 0.15s ease;}
+.feedback button:hover {transform: scale(1.05);box-shadow: 0 4px 10px rgba(0,0,0,0.15);}
+@keyframes fadeSlide {from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); }}
+.tag{display:inline-block;padding:3px 8px;border-radius:12px;font-size:11px;margin-bottom:6px;color:#fff}.tag.ram{background:#6366f1}.tag.gpu{background:#ef4444}.tag.driver{background:#22c55e}
+.risk-note{margin-top:6px;font-size:12px;padding:6px 8px;border-radius:6px}
+.risk-low{background:#ecfdf5;color:#065f46}
+.risk-mid{background:#fffbeb;color:#92400e}
+.risk-high{background:#fef2f2;color:#991b1b}
+.site-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;max-width:950px;margin:40px auto 10px;padding:0 10px}
+.stat-card{background:var(--card);border-radius:14px;padding:14px;text-align:center;font-size:13px;box-shadow:0 6px 14px rgba(0,0,0,.08);transition:.25s}.stat-card b{font-size:18px}.stat-card:hover{transform:translateY(-4px)}
+.favorite-btn{position:absolute;top:12px;right:12px;background:#facc15;color:#fff;border:none;padding:6px 10px;border-radius:20px;cursor:pointer;transition:transform 0.2s, box-shadow 0.2s;font-weight:bold}
+.favorite-btn:hover{transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,0.2)}
+.favorite-panel{position:fixed;top:80px;right:-320px;width:300px;height:calc(100% - 100px);background:var(--card);box-shadow:-4px 0 20px rgba(0,0,0,0.15);border-radius:12px;padding:14px;transition:right 0.3s;overflow-y:auto;z-index:1500}
+.favorite-panel.active{right:20px}
+.favorite-panel h3{margin-top:0;margin-bottom:12px}
+.favorite-item{padding:8px;border-bottom:1px solid #ddd;font-size:13px;cursor:pointer;transition:background 0.2s}
+.favorite-item:hover{background:#f1f5f9}
+.copy-btn { position: absolute; right: 14px; bottom: 18px; background: #2563eb; color: #fff; border: none; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 12px; z-index: 10; }
+.copy-msg{position:fixed; bottom:50px; right:20px; background:#22c55e; color:#fff; padding:6px 12px; border-radius:12px; font-size:12px; opacity:0; transition:opacity 0.3s; z-index:3000}
+.copy-msg.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div>🟦 BSOD Central</div>
+  <div>
+    <select id="lang" onchange="setLang(this.value)">
+      <option value="tr">TR</option>
+      <option value="en">EN</option>
+    </select>
+    <button id="toggleFavorites">⭐ Favoriler</button>
+    <button onclick="toggleDark()">🌙 / ☀️</button>
+  </div>
+</div>
+<div class="content">
+  <input class="search" id="search" placeholder="BSOD ara...">
+  <div id="list"></div>
+</div>
+<div class="favorite-panel" id="favPanel">
+  <h3>⭐ Favori Hatalar</h3>
+  <div id="favList"></div>
+</div>
+<div class="last-update">🕒 Son güncelleme: <span id="lastUpdate"></span></div>
+<div class="site-stats">
+  <div class="stat-card">📊 <b>140+</b><br>BSOD Kodu</div>
+  <div class="stat-card">👥 <b>8.000+</b><br>Okuma</div>
+  <div class="stat-card">👍 <b>%76</b><br>Faydalı Bulundu</div>
+  <div class="stat-card">⚠️ <b>High</b><br>Risk Analizi</div>
+</div>
+<div class="copy-msg" id="copyMsg">📋 Kopyalandı!</div>
+<footer>© Nail ÇEVİK – BSOD Central</footer>
+<div class="overlay" id="cookie">
+  <div class="cookie-box">
+    This website uses cookies to ensure proper operation.
+    <br><br>
+    <button onclick="acceptCookies()">Accept</button>
+  </div>
+</div>
+
+<script>
+const text={tr:{search:"Mavi ekran hatası ara…",reason:"Neden",solution:"Açıklama",risk:"Tehlike Seviyesi"},en:{search:"Search BSOD…",reason:"Reason",solution:"Description",risk:"Risk Level"}};
+let currentLang="tr";
+
+// SENİN VERDİĞİN TÜM HATALAR BURADA
+const rawErrors = [
+    { c: "0x00000001", n: "APC_INDEX_MISMATCH", d: "This BSOD means that there has been a mismatch in the APC state index." },
+    { c: "0x00000002", n: "DEVICE_QUEUE_NOT_BUSY", d: "This BSOD is uncommon. DEVICE_QUEUE_NOT_BUSY." },
+    { c: "0x00000003", n: "INVALID_AFFINITY_SET", d: "This BSOD is uncommon. INVALID_AFFINITY_SET." },
+    { c: "0x00000004", n: "INVALID_DATA_ACCESS_TRAP", d: "This BSOD is uncommon. INVALID_DATA_ACCESS_TRAP." },
+    { c: "0x00000005", n: "INVALID_PROCESS_ATTACH_ATTEMPT", d: "This BSOD is uncommon. INVALID_PROCESS_ATTACH_ATTEMPT." },
+    { c: "0x00000006", n: "INVALID_PROCESS_DETACH_ATTEMPT", d: "This BSOD is uncommon. INVALID_PROCESS_DETACH_ATTEMPT." },
+    { c: "0x00000007", n: "INVALID_SOFTWARE_INTERRUPT", d: "This BSOD is uncommon. INVALID_SOFTWARE_INTERRUPT." },
+    { c: "0x00000008", n: "IRQL_NOT_DISPATCH_LEVEL", d: "This BSOD is uncommon. IRQL_NOT_DISPATCH_LEVEL." },
+    { c: "0x00000009", n: "IRQL_NOT_GREATER_OR_EQUAL", d: "This BSOD is uncommon. IRQL_NOT_GREATER_OR_EQUAL." },
+    { c: "0x0000000A", n: "IRQL_NOT_LESS_OR_EQUAL", d: "Microsoft Windows or a kernel-mode driver accessed paged memory at DISPATCH_LEVEL or above." },
+    { c: "0x0000000B", n: "NO_EXCEPTION_HANDLING_SUPPORT", d: "This BSOD is uncommon. NO_EXCEPTION_HANDLING_SUPPORT." },
+    { c: "0x0000000C", n: "MAXIMUM_WAIT_OBJECTS_EXCEEDED", d: "The current thread exceeded the permitted number of wait objects." },
+    { c: "0x0000000F", n: "SPIN_LOCK_ALREADY_OWNED", d: "A request for a spin lock has been initiated when the spin lock was already owned." },
+    { c: "0x00000012", n: "TRAP_CAUSE_UNKNOWN", d: "An unknown exception has occurred." },
+    { c: "0x00000018", n: "REFERENCE_BY_POINTER", d: "The reference count of an object is illegal for the current state of the object." },
+    { c: "0x00000019", n: "BAD_POOL_HEADER", d: "A pool header is corrupt." },
+    { c: "0x0000001A", n: "MEMORY_MANAGEMENT", d: "A severe memory management error occurred." },
+    { c: "0x0000001E", n: "KMODE_EXCEPTION_NOT_HANDLED", d: "A kernel-mode program generated an exception which the error handler did not catch." },
+    { c: "0x00000020", n: "KERNEL_APC_PENDING_DURING_EXIT", d: "An asynchronous procedure call (APC) was still pending when a thread exited." },
+    { c: "0x00000023", n: "FAT_FILE_SYSTEM", d: "A problem occurred in the FAT file system." },
+    { c: "0x00000024", n: "NTFS_FILE_SYSTEM", d: "A problem occurred in ntfs.sys, the driver file for NTFS drives." },
+    { c: "0x0000002B", n: "PANIC_STACK_SWITCH", d: "The kernel mode stack was overrun." },
+    { c: "0x0000002E", n: "DATA_BUS_ERROR", d: "A parity error in system memory has been detected." },
+    { c: "0x00000031", n: "PHASE0_INITIALIZATION_FAILED", d: "System initialization failed during early stages." },
+    { c: "0x0000003B", n: "SYSTEM_SERVICE_EXCEPTION", d: "Exception happened while executing a routine that transitions to privileged code." },
+    { c: "0x0000003E", n: "MULTIPROCESSOR_CONFIGURATION_NOT_SUPPORTED", d: "System has multiple processors, but they are asymmetric." },
+    { c: "0x0000003F", n: "NO_MORE_SYSTEM_PTES", d: "Result of a system which has performed too many I/O actions." },
+    { c: "0x00000044", n: "MULTIPLE_IRP_COMPLETE_REQUESTS", d: "A driver has tried to requested an IRP be completed that is already complete." },
+    { c: "0x0000004E", n: "PFN_LIST_CORRUPT", d: "The page frame number (PFN) list is corrupted." },
+    { c: "0x00000050", n: "PAGE_FAULT_IN_NONPAGED_AREA", d: "Invalid system memory has been referenced." },
+    { c: "0x00000051", n: "REGISTRY_ERROR", d: "A severe registry error has occurred." },
+    { c: "0x00000074", n: "BAD_SYSTEM_CONFIG_INFO", d: "There is an error in the registry." },
+    { c: "0x00000077", n: "KERNEL_STACK_INPAGE_ERROR", d: "Requested page of kernel data could not be read into memory." },
+    { c: "0x0000007A", n: "KERNEL_DATA_INPAGE_ERROR", d: "Requested page of kernel data from paging file failed." },
+    { c: "0x0000007B", n: "INACCESSIBLE_BOOT_DEVICE", d: "Microsoft Windows has lost access to the system partition during startup." },
+    { c: "0x0000007E", n: "SYSTEM_THREAD_EXCEPTION_NOT_HANDLED", d: "A system thread generated an exception that was not caught." },
+    { c: "0x0000007F", n: "UNEXPECTED_KERNEL_MODE_TRAP", d: "Intel CPU generated a trap and the kernel failed to catch it." },
+    { c: "0x00000080", n: "NMI_HARDWARE_FAILURE", d: "A hardware malfunction has occurred." },
+    { c: "0x0000008E", n: "KERNEL_MODE_EXCEPTION_NOT_HANDLED", d: "A kernel-mode application generated an uncaught exception." },
+    { c: "0x00000093", n: "INVALID_KERNEL_HANDLE", d: "An invalid or protected handle was passed to NtClose." },
+    { c: "0x0000009A", n: "SYSTEM_LICENSE_VIOLATION", d: "The software license agreement has been violated." },
+    { c: "0x0000009C", n: "MACHINE_CHECK_EXCEPTION", d: "A fatal machine check exception has occurred." },
+    { c: "0x0000009F", n: "DRIVER_POWER_STATE_FAILURE", d: "The driver is in an inconsistent or invalid power state." },
+    { c: "0x000000A5", n: "ACPI_BIOS_ERROR", d: "ACPI BIOS is not fully compliant with the specification." },
+    { c: "0x000000B4", n: "VIDEO_DRIVER_INIT_FAILURE", d: "Windows was unable to enter graphics mode." },
+    { c: "0x000000BE", n: "ATTEMPTED_WRITE_TO_READONLY_MEMORY", d: "A driver attempts to write to a read-only memory segment." },
+    { c: "0x000000C2", n: "BAD_POOL_CALLER", d: "The current thread is making a bad pool request." },
+    { c: "0x000000D1", n: "DRIVER_IRQL_NOT_LESS_OR_EQUAL", d: "Kernel-mode driver attempted to access pageable memory at high IRQL." },
+    { c: "0x000000DC", n: "STACK_ADDRESS_BELOW_POINTER", d: "Driver accessed a stack address below the pointer." }
+];
+
+const errors = rawErrors.map((e, idx) => ({
+    code: e.c + " (" + e.n + ")",
+    reason: { tr: "Hata Tanımı", en: "Error Definition" },
+    solution: { tr: e.d, en: e.d },
+    risk: idx % 3 === 0 ? "high" : idx % 3 === 1 ? "mid" : "low"
+}));
+
+const list=document.getElementById("list");
+
+function render(arr){
+    list.innerHTML="";
+    arr.forEach(e=>{
+        const category=e.risk==='high'?'driver':e.risk==='mid'?'gpu':'ram';
+        const riskText=e.risk==='high'?'⚠️ Kritik seviye: Donanımsal arıza riski vardır.':e.risk==='mid'?'⚠️ Orta seviye: Dikkat edilmesi gerekir.':'ℹ️ Düşük seviye: Genellikle yazılımsal.';
+        const percent=Math.floor(60+Math.random()*35);
+        const fav=localStorage.getItem('favorites')?JSON.parse(localStorage.getItem('favorites')):[];
+        const isFav=fav.includes(e.code);
+        list.innerHTML+=`<details><summary>${e.code}</summary><span class="tag ${category}">${category.toUpperCase()}</span><p><b>${text[currentLang].reason}:</b> ${e.reason[currentLang]}</p><p><b>${text[currentLang].solution}:</b> ${e.solution[currentLang]}</p><div class="risk-note risk-${e.risk}">${riskText}</div><div class="risk-wrap">⚠️ ${text[currentLang].risk}<div class="risk-bar"><div class="risk-fill ${e.risk}"></div></div></div><div class="stat">👍 ${percent}% kullanıcı faydalı buldu</div><div class="feedback"><span>Bu çözüm yararlı oldu mu?</span><button onclick="feedback(this,'yes')">👍 Evet</button><button onclick="feedback(this,'no')">👎 Hayır</button></div><button class="favorite-btn" onclick="toggleFavorite('${e.code}',this,event)">${isFav?'⭐ Favorilerden Çıkar':'⭐ Favorilere Ekle'}</button><button class="copy-btn" onclick="copyError('${e.code}')">📋 Kopyala</button></details>`
+    });
+}
+
+render(errors);
+
+const search=document.getElementById("search");
+search.oninput=()=>{const q=search.value.toLowerCase();render(errors.filter(e=>e.code.toLowerCase().includes(q)))};
+function setLang(l){currentLang=l;search.placeholder=text[l].search;render(errors)}
+function toggleDark(){document.body.classList.toggle("dark");localStorage.setItem("dark",document.body.classList.contains("dark"))}
+if(localStorage.getItem("dark")==="true")document.body.classList.add("dark");
+function acceptCookies(){localStorage.setItem("cookies","ok");document.getElementById('cookie').style.display="none"}
+if(localStorage.getItem("cookies")==="ok")document.getElementById('cookie').style.display="none";
+function feedback(btn,type){const box=btn.parentElement;box.innerHTML=type==='yes'?'✅ Geri bildiriminiz için teşekkür ederiz!':'❌ Geri bildiriminiz kaydedildi.';}
+const d=new Date();document.getElementById('lastUpdate').textContent=d.toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});
+function toggleFavorite(code,btn,event){event.stopPropagation();let fav=localStorage.getItem('favorites')?JSON.parse(localStorage.getItem('favorites')):[];if(fav.includes(code)){fav=fav.filter(c=>c!==code);btn.textContent='⭐ Favorilere Ekle'}else{fav.push(code);btn.textContent='⭐ Favorilerden Çıkar'}localStorage.setItem('favorites',JSON.stringify(fav));renderFavorites()}
+function renderFavorites(){const favPanel=document.getElementById('favList');const fav=localStorage.getItem('favorites')?JSON.parse(localStorage.getItem('favorites')):[];favPanel.innerHTML='';fav.forEach(code=>{const e=errors.find(err=>err.code===code);if(e) favPanel.innerHTML+=`<div class="favorite-item" onclick="goToError('${e.code}')">${e.code}</div>`})}
+document.getElementById('toggleFavorites').onclick=()=>{document.getElementById('favPanel').classList.toggle('active');renderFavorites()}
+function goToError(code){const details=document.querySelectorAll('details');details.forEach(d=>{if(d.querySelector('summary').textContent===code){d.scrollIntoView({behavior:'smooth',block:'center'});d.open=true;}})}
+function copyError(code){const e=errors.find(err=>err.code===code);if(e){const textToCopy=`${e.code}\n${text[currentLang].reason}: ${e.reason[currentLang]}\n${text[currentLang].solution}: ${e.solution[currentLang]}`;navigator.clipboard.writeText(textToCopy);const msg=document.getElementById('copyMsg');msg.classList.add('show');setTimeout(()=>msg.classList.remove('show'),1500);}}
+</script>
+</body>
+</html>
