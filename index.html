@@ -558,8 +558,43 @@ body.dark .favorite-item:hover {
     box-sizing: border-box;
 }
 
+.top-stats {
+    max-width: 950px;
+    margin: 20px auto 10px;
+    padding: 14px 18px;
+    background: var(--card);
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0,0,0,.12);
+}
 
+.top-stats-title {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #2563eb;
+}
 
+.top-stats-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.top-error {
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    background: rgba(37,99,235,.12);
+    color: #2563eb;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.top-error:hover {
+    background: #2563eb;
+    color: #fff;
+}
 
     </style>
 </head>
@@ -573,9 +608,17 @@ body.dark .favorite-item:hover {
 </div>
 
 <div class="content">
-  <input class="search" id="search" placeholder="BSOD ara...">
+  <input class="search" id="search" placeholder="Search any BSOD...">
+
+  <div class="top-stats">
+    <div class="top-stats-title">🔥 Most searched BSOD errors</div>
+    <div class="top-stats-list" id="topErrors"></div>
+</div>
+
   <div id="list"></div>
 </div>
+
+
 
 <div class="favorite-panel" id="favPanel">
   <h3>⭐ Favorite Errors </h3>
@@ -676,6 +719,9 @@ function render(arr) {
     list.innerHTML = "";
 
     arr.forEach(e => {
+
+    countSearch(e.code);
+
         const category =
             e.risk === 'high' ? 'driver' :
             e.risk === 'mid'  ? 'gpu' :
@@ -698,7 +744,8 @@ function render(arr) {
 
         list.innerHTML += `
             <details>
-                <summary>${e.code}</summary>
+                <summary onclick="countView('${e.code}')">${e.code}</summary>
+
 
                 <span class="tag ${category}">
                     ${category.toUpperCase()}
@@ -757,9 +804,34 @@ function render(arr) {
 
 render(errors);
 
+renderTopStats();
+
+
+document.addEventListener("click", function (e) {
+    const btn = e.target.closest(".feedback-btn");
+    if (!btn) return;
+
+    const box = btn.closest(".feedback-box");
+    if (!box) return;
+
+    const code = box.getAttribute("data-code");
+
+    let feedbacks = JSON.parse(localStorage.getItem("feedbacks")) || {};
+    feedbacks[code] = Date.now();
+    localStorage.setItem("feedbacks", JSON.stringify(feedbacks));
+
+    box.innerHTML = `
+        <div class="feedback-title">
+            ✅ Geri bildiriminiz için teşekkürler!
+        </div>
+    `;
+});
+
+
 
 const search=document.getElementById("search");
 search.oninput=()=>{const q=search.value.toLowerCase();render(errors.filter(e=>e.code.toLowerCase().includes(q)))};
+
 
 function sendFeedback(code, value, btn) {
     const DAY = 24 * 60 * 60 * 1000;
@@ -839,6 +911,66 @@ function feedbackVote(code, box) {
     box.classList.add("feedback-thanks");
 }
 
+function renderTopStats() {
+    const box = document.getElementById("topErrors");
+    if (!box) return;
+
+    const views = JSON.parse(localStorage.getItem("bsod_views")) || {};
+
+    const sorted = Object.entries(views)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+
+    box.innerHTML = "";
+
+    if (sorted.length === 0) {
+        box.innerHTML = "<div style='font-size:12px;opacity:.6'>Henüz veri yok</div>";
+        return;
+    }
+
+    sorted.forEach(([code, count]) => {
+        const div = document.createElement("div");
+        div.className = "top-stats-item";
+        div.textContent = `${code} (${count})`;
+
+        div.onclick = () => goToError(code);
+
+        box.appendChild(div);
+    });
+}
+
+
+function countView(code) {
+    let views = JSON.parse(localStorage.getItem("bsod_views")) || {};
+    views[code] = (views[code] || 0) + 1;
+    localStorage.setItem("bsod_views", JSON.stringify(views));
+}
+
 </script>
+
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyBzllnsB7YpBo3zpAhJCX2syPMlXlZumeY",
+    authDomain: "bsodcentral-23af4.firebaseapp.com",
+    projectId: "bsodcentral-23af4",
+    storageBucket: "bsodcentral-23af4.firebasestorage.app",
+    messagingSenderId: "460072681940",
+    appId: "1:460072681940:web:b08bb35536798848acd641",
+    measurementId: "G-REBSZB9F4M"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
+
 </body>
 </html>
