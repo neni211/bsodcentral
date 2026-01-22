@@ -8,48 +8,348 @@
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2775753189756640" crossorigin="anonymous"></script>
 
     <style>
-        :root{--bg:#cce7ff;--card:#fff;--text:#0f172a}
-        body.dark{--bg:#0f172a;--card:#1e293b;--text:#e5e7eb}
-        body{margin:0;padding:20px;background:var(--bg);color:var(--text);font-family:Arial, sans-serif;transition:.4s}
-        .topbar{position:fixed;top:0;left:0;right:0;background:linear-gradient(90deg,#2563eb,#38bdf8);color:#fff;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;z-index:1000}
-        .topbar select,.topbar button{margin-left:8px;padding:6px 10px;border-radius:20px;border:none;font-weight:bold;cursor:pointer}
-        .topbar select{background:#fff;color:#2563eb}
-        .topbar button{background:#fff;color:#2563eb}
-        .content{margin-top:80px;max-width:950px;margin-inline:auto}
-        .search{width:100%;padding:12px;border-radius:8px;border:1px solid #cbd5f5;font-size:15px;margin-bottom:15px}
-        details{background:var(--card);border-radius:10px;padding:14px;margin:12px 0;box-shadow:0 6px 14px rgba(0,0,0,.08);transition:transform 0.2s;position:relative}
-        summary{cursor:pointer;font-weight:bold}
-        .risk-wrap{margin-top:10px;font-size:13px}
-        .risk-bar{height:10px;border-radius:6px;background:#e5e7eb;overflow:hidden;margin-top:4px}
-        .risk-fill{height:100%;width:0;animation:fill 1.2s ease forwards}
-        .low{background:#22c55e;width:33%}
-        .mid{background:#f59e0b;width:66%}
-        .high{background:#ef4444;width:100%}
-        @keyframes fill{from{width:0}}
-        .overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:2000}
-        .cookie-box{background:var(--card);padding:25px;width:350px;border-radius:12px;text-align:center;font-size:14px;box-shadow:0 10px 25px rgba(0,0,0,0.2)}
-        .cookie-box h3{margin-top:0; color:var(--text)}
-        .cookie-buttons{display:flex;gap:10px;flex-direction:column;margin-top:15px}
-        .cookie-box button{width:100%;padding:10px;border:none;border-radius:8px;cursor:pointer;font-weight:bold;transition:opacity 0.2s}
-        .accept-btn{background:#2563eb;color:#fff}
-        .manage-btn{background:#e5e7eb;color:#1e293b}
-        @media (min-width:480px){.cookie-buttons{flex-direction:row}}
-        footer{text-align:center;font-size:12px;margin:40px 0;color:#64748b}
-        .feedback {margin-top: 12px;padding: 12px;background: #f5f7fa;border-left: 4px solid #4da3ff;border-radius: 8px;font-size: 13px;}
-        .tag{display:inline-block;padding:3px 8px;border-radius:12px;font-size:11px;margin-bottom:6px;color:#fff}.tag.ram{background:#6366f1}.tag.gpu{background:#ef4444}.tag.driver{background:#22c55e}
-        .risk-note{margin-top:6px;font-size:12px;padding:6px 8px;border-radius:6px}
-        .risk-low{background:#ecfdf5;color:#065f46}
-        .risk-mid{background:#fffbeb;color:#92400e}
-        .risk-high{background:#fef2f2;color:#991b1b}
-        .site-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;max-width:950px;margin:40px auto 10px;padding:0 10px}
-        .stat-card{background:var(--card);border-radius:14px;padding:14px;text-align:center;font-size:13px;box-shadow:0 6px 14px rgba(0,0,0,.08);transition:.25s}.stat-card b{font-size:18px}.stat-card:hover{transform:translateY(-4px)}
-        .favorite-btn{position:absolute;top:12px;right:12px;background:#facc15;color:#fff;border:none;padding:6px 10px;border-radius:20px;cursor:pointer;font-weight:bold}
-        .favorite-panel{position:fixed;top:80px;right:-320px;width:300px;height:calc(100% - 100px);background:var(--card);box-shadow:-4px 0 20px rgba(0,0,0,0.15);border-radius:12px;padding:14px;transition:right 0.3s;overflow-y:auto;z-index:1500}
-        .favorite-panel.active{right:20px}
-        .favorite-item{padding:8px;border-bottom:1px solid #ddd;font-size:13px;cursor:pointer}
-        .copy-btn { position: absolute; right: 14px; bottom: 18px; background: #2563eb; color: #fff; border: none; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 12px; }
-        .copy-msg{position:fixed; bottom:50px; right:20px; background:#22c55e; color:#fff; padding:6px 12px; border-radius:12px; font-size:12px; opacity:0; transition:opacity 0.3s; z-index:3000}
-        .copy-msg.show{opacity:1}
+:root {
+  --bg: #cce7ff;
+  --card: #fff;
+  --text: #0f172a;
+}
+
+body.dark {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --text: #e5e7eb;
+}
+
+body {
+  margin: 0;
+  padding: 20px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+  transition: .4s;
+}
+
+/* TOP BAR */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(90deg, #2563eb, #38bdf8);
+  color: #fff;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+}
+
+.topbar select,
+.topbar button {
+  margin-left: 8px;
+  padding: 6px 10px;
+  border-radius: 20px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.topbar select {
+  background: #fff;
+  color: #2563eb;
+}
+
+.topbar button {
+  background: #fff;
+  color: #2563eb;
+}
+
+/* CONTENT */
+.content {
+  margin-top: 80px;
+  max-width: 950px;
+  margin-inline: auto;
+}
+
+.search {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5f5;
+  font-size: 15px;
+  margin-bottom: 15px;
+}
+
+/* DETAILS */
+details {
+  background: var(--card);
+  border-radius: 10px;
+  padding: 14px;
+  margin: 12px 0;
+  box-shadow: 0 6px 14px rgba(0,0,0,.08);
+  transition: transform 0.2s;
+  position: relative;
+}
+
+summary {
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* RISK BAR */
+.risk-wrap {
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+.risk-bar {
+  height: 10px;
+  border-radius: 6px;
+  background: #e5e7eb;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.risk-fill {
+  height: 100%;
+  width: 0;
+  animation: fill 1.2s ease forwards;
+}
+
+.low {
+  background: #22c55e;
+  width: 33%;
+}
+
+.mid {
+  background: #f59e0b;
+  width: 66%;
+}
+
+.high {
+  background: #ef4444;
+  width: 100%;
+}
+
+@keyframes fill {
+  from { width: 0 }
+}
+
+/* COOKIE OVERLAY */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.cookie-box {
+  background: var(--card);
+  padding: 25px;
+  width: 350px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 14px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.cookie-box h3 {
+  margin-top: 0;
+  color: var(--text);
+}
+
+.cookie-buttons {
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+  margin-top: 15px;
+}
+
+.cookie-box button {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: opacity 0.2s;
+}
+
+.accept-btn {
+  background: #2563eb;
+  color: #fff;
+}
+
+.manage-btn {
+  background: #e5e7eb;
+  color: #1e293b;
+}
+
+@media (min-width: 480px) {
+  .cookie-buttons {
+    flex-direction: row;
+  }
+}
+
+/* FOOTER */
+footer {
+  text-align: center;
+  font-size: 12px;
+  margin: 40px 0;
+  color: #64748b;
+}
+
+/* FEEDBACK */
+.feedback {
+  margin-top: 12px;
+  padding: 12px;
+  background: #f5f7fa;
+  border-left: 4px solid #4da3ff;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+/* TAGS */
+.tag {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  margin-bottom: 6px;
+  color: #fff;
+}
+
+.tag.ram { background: #6366f1; }
+.tag.gpu { background: #ef4444; }
+.tag.driver { background: #22c55e; }
+
+/* RISK NOTES */
+.risk-note {
+  margin-top: 6px;
+  font-size: 12px;
+  padding: 6px 8px;
+  border-radius: 6px;
+}
+
+.risk-low {
+  background: #ecfdf5;
+  color: #065f46;
+}
+
+.risk-mid {
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.risk-high {
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+/* SITE STATS */
+.site-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  max-width: 950px;
+  margin: 40px auto 10px;
+  padding: 0 10px;
+}
+
+.stat-card {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 14px;
+  text-align: center;
+  font-size: 13px;
+  box-shadow: 0 6px 14px rgba(0,0,0,.08);
+  transition: .25s;
+}
+
+.stat-card b {
+  font-size: 18px;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+}
+
+/* FAVORITES */
+.favorite-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #facc15;
+  color: #fff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.favorite-panel {
+  position: fixed;
+  top: 80px;
+  right: -320px;
+  width: 300px;
+  height: calc(100% - 100px);
+  background: var(--card);
+  box-shadow: -4px 0 20px rgba(0,0,0,0.15);
+  border-radius: 12px;
+  padding: 14px;
+  transition: right 0.3s;
+  overflow-y: auto;
+  z-index: 1500;
+}
+
+.favorite-panel.active {
+  right: 20px;
+}
+
+.favorite-item {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* COPY BUTTON */
+.copy-btn {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.copy-msg {
+  position: fixed;
+  bottom: 50px;
+  right: 20px;
+  background: #22c55e;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 3000;
+}
+
+.copy-msg.show {
+  opacity: 1;
+}
+
         /* =========================
    BSOD CENTRAL – PRO UI SKIN
    (No logic change – visual only)
@@ -174,6 +474,93 @@ body.dark .favorite-item:hover {
     background: rgba(255,255,255,.06);
 }
 
+/* =========================
+   PREMIUM FEEDBACK UI
+========================= */
+
+.feedback-box {
+  margin-bottom: 28px;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+  border: 1px solid rgba(255,255,255,.12);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.feedback-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #aac3ee;
+  letter-spacing: .3px;
+}
+
+.feedback-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.feedback-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.15);
+  background: rgba(37, 99, 235, 0.1); /* Hafif mavi şeffaf arka plan */
+    color: #2563eb;                    /* Yazı rengini belirgin mavi yap */
+    border: 1px solid #2563eb;         /* Belirgin kenarlık */
+    
+    cursor: pointer;
+    transition: all .25s ease;
+}
+
+.feedback-btn span {
+  opacity: .9;
+}
+
+.feedback-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0,0,0,.25);
+  background: rgba(255,255,255,.12);
+}
+
+.feedback-btn.yes:hover {
+  border-color: rgba(0,160,255,.6);
+  color: #a8d9ff;
+}
+
+.feedback-btn.no:hover {
+  border-color: rgba(255,90,90,.6);
+  color: #ffb3b3;
+}
+
+.feedback-btn:active {
+  transform: scale(.96);
+}
+
+.feedback {
+    background: var(--card);
+    border: 1px #6393d3;
+    border-radius: 8px;
+}
+
+
+.feedback {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-right: 90px;
+    box-sizing: border-box;
+}
+
+
+
+
     </style>
 </head>
 <body>
@@ -285,22 +672,144 @@ const errors = rawErrors.map((e, idx) => ({
 
 const list=document.getElementById("list");
 
-function render(arr){
-    list.innerHTML="";
-    arr.forEach(e=>{
-        const category=e.risk==='high'?'driver':e.risk==='mid'?'gpu':'ram';
-        const riskText=e.risk==='high'?'⚠️ Critical level: Risk of hardware failure.':e.risk==='mid'?'⚠️ Intermediate level: Caution is required.':'ℹ️ Low-level: Typically software-related.';
-        const percent=Math.floor(60+Math.random()*35);
-        const fav=localStorage.getItem('favorites')?JSON.parse(localStorage.getItem('favorites')):[];
-        const isFav=fav.includes(e.code);
-        list.innerHTML+=`<details><summary>${e.code}</summary><span class="tag ${category}">${category.toUpperCase()}</span><p><b>${text[currentLang].reason}:</b> ${e.reason[currentLang]}</p><p><b>${text[currentLang].solution}:</b> ${e.solution[currentLang]}</p><div class="risk-note risk-${e.risk}">${riskText}</div><div class="risk-wrap">⚠️ ${text[currentLang].risk}<div class="risk-bar"><div class="risk-fill ${e.risk}"></div></div></div><div class="stat">👍 ${percent}% users found this helpful</div><div class="feedback"><span>Is that description helpful?</span><button onclick="feedback(this,'yes')">👍 Yes!</button><button onclick="feedback(this,'no')">👎 No :(</button></div><button class="favorite-btn" onclick="toggleFavorite('${e.code}',this,event)">${isFav?'⭐ Delete on Favorites':'⭐ Add to Favorites'}</button><button class="copy-btn" onclick="copyError('${e.code}')">📋 Copy</button></details>`
+function render(arr) {
+    list.innerHTML = "";
+
+    arr.forEach(e => {
+        const category =
+            e.risk === 'high' ? 'driver' :
+            e.risk === 'mid'  ? 'gpu' :
+                                'ram';
+
+        const riskText =
+            e.risk === 'high'
+                ? '⚠️ Critical level: Risk of hardware failure.'
+                : e.risk === 'mid'
+                    ? '⚠️ Intermediate level: Caution is required.'
+                    : 'ℹ️ Low-level: Typically software-related.';
+
+        const percent = Math.floor(60 + Math.random() * 35);
+
+        const fav = localStorage.getItem('favorites')
+            ? JSON.parse(localStorage.getItem('favorites'))
+            : [];
+
+        const isFav = fav.includes(e.code);
+
+        list.innerHTML += `
+            <details>
+                <summary>${e.code}</summary>
+
+                <span class="tag ${category}">
+                    ${category.toUpperCase()}
+                </span>
+
+                <p>
+                    <b>${text[currentLang].reason}:</b>
+                    ${e.reason[currentLang]}
+                </p>
+
+                <p>
+                    <b>${text[currentLang].solution}:</b>
+                    ${e.solution[currentLang]}
+                </p>
+
+                <div class="risk-note risk-${e.risk}">
+                    ${riskText}
+                </div>
+
+                <div class="risk-wrap">
+                    ⚠️ ${text[currentLang].risk}
+                    <div class="risk-bar">
+                        <div class="risk-fill ${e.risk}"></div>
+                    </div>
+                </div>
+
+                <div class="stat">
+                    👍 ${percent}% users found this helpful
+                </div>
+
+ <div class="feedback-box">
+  <div class="feedback-title">Was this helpful?</div>
+  <div class="feedback-actions">
+    <button class="feedback-btn yes">👍 <span>Yes</span></button>
+    <button class="feedback-btn no">👎 <span>No</span></button>
+  </div>
+</div>
+
+
+                <button
+                    class="favorite-btn"
+                    onclick="toggleFavorite('${e.code}', this, event)">
+                    ${isFav ? '⭐ Delete on Favorites' : '⭐ Add to Favorites'}
+                </button>
+
+                <button
+                    class="copy-btn"
+                    onclick="copyError('${e.code}')">
+                    📋 Copy
+                </button>
+            </details>
+        `;
     });
 }
+
 
 render(errors);
 
 const search=document.getElementById("search");
 search.oninput=()=>{const q=search.value.toLowerCase();render(errors.filter(e=>e.code.toLowerCase().includes(q)))};
+
+function sendFeedback(code, value, btn) {
+    const DAY = 24 * 60 * 60 * 1000;
+
+    // feedback kayıtları
+    let feedbacks = JSON.parse(localStorage.getItem("feedbacks")) || {};
+
+    // zaman kaydet
+    feedbacks[code] = {
+        value: value,
+        time: Date.now()
+    };
+
+    localStorage.setItem("feedbacks", JSON.stringify(feedbacks));
+
+    // mesaj göster
+    const box = btn.closest(".feedback-box");
+    box.innerHTML = `
+        <div class="feedback-title">
+            ✅ Geri bildiriminiz için teşekkürler!
+        </div>
+    `;
+}
+
+function checkFeedbacks() {
+    const DAY = 24 * 60 * 60 * 1000;
+    let feedbacks = JSON.parse(localStorage.getItem("feedbacks")) || {};
+
+    document.querySelectorAll(".feedback-box").forEach(box => {
+        const code = box.getAttribute("data-code");
+        const data = feedbacks[code];
+
+        if (!data) return;
+
+        // 24 saat dolmuş mu?
+        if (Date.now() - data.time > DAY) {
+            delete feedbacks[code];
+            localStorage.setItem("feedbacks", JSON.stringify(feedbacks));
+            return;
+        }
+
+        // dolmamışsa teşekkür mesajı göster
+        box.innerHTML = `
+            <div class="feedback-title">
+                ✅ Geri bildiriminiz için teşekkürler!
+            </div>
+        `;
+    });
+}
+
+
 
 function setLang(l){currentLang=l;search.placeholder=text[l].search;render(errors)}
 
@@ -315,7 +824,7 @@ function feedback(btn,type){const box=btn.parentElement;box.innerHTML=type==='ye
 
 const d=new Date();document.getElementById('lastUpdate').textContent=d.toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});
 
-function toggleFavorite(code,btn,event){event.stopPropagation();let fav=localStorage.getItem('favorites')?JSON.parse(localStorage.getItem('favorites')):[];if(fav.includes(code)){fav=fav.filter(c=>c!==code);btn.textContent='⭐ Add to Favorites'}else{fav.push(code);btn.textContent='⭐ Delete on'}localStorage.setItem('favorites',JSON.stringify(fav));renderFavorites()}
+function toggleFavorite(code,btn,event){event.stopPropagation();let fav=localStorage.getItem('favorites')?JSON.parse(localStorage.getItem('favorites')):[];if(fav.includes(code)){fav=fav.filter(c=>c!==code);btn.textContent='⭐ Add to Favorites'}else{fav.push(code);btn.textContent='⭐ Unfavorite'}localStorage.setItem('favorites',JSON.stringify(fav));renderFavorites()}
 
 function renderFavorites(){const favPanel=document.getElementById('favList');const fav=localStorage.getItem('favorites')?JSON.parse(localStorage.getItem('favorites')):[];favPanel.innerHTML='';fav.forEach(code=>{const e=errors.find(err=>err.code===code);if(e) favPanel.innerHTML+=`<div class="favorite-item" onclick="goToError('${e.code}')">${e.code}</div>`})}
 
