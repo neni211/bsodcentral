@@ -757,6 +757,7 @@ function render(arr) {
 
 render(errors);
 
+
 const search=document.getElementById("search");
 search.oninput=()=>{const q=search.value.toLowerCase();render(errors.filter(e=>e.code.toLowerCase().includes(q)))};
 
@@ -778,38 +779,35 @@ function sendFeedback(code, value, btn) {
     const box = btn.closest(".feedback-box");
     box.innerHTML = `
         <div class="feedback-title">
-            ✅ Geri bildiriminiz için teşekkürler!
+            ✅ Thanks for your feedback!
         </div>
     `;
 }
 
-function checkFeedbacks() {
-    const DAY = 24 * 60 * 60 * 1000;
+document.addEventListener("click", function (e) {
+    const btn = e.target.closest(".feedback-btn");
+    if (!btn) return;
+
+    const box = btn.closest(".feedback-box");
+    if (!box) return;
+
+    const code = box.getAttribute("data-code");
+
     let feedbacks = JSON.parse(localStorage.getItem("feedbacks")) || {};
+    feedbacks[code] = Date.now();
+    localStorage.setItem("feedbacks", JSON.stringify(feedbacks));
 
-    document.querySelectorAll(".feedback-box").forEach(box => {
-        const code = box.getAttribute("data-code");
-        const data = feedbacks[code];
+    box.innerHTML = `
+        <div class="feedback-title">
+            ✅ Geri bildiriminiz için teşekkürler!
+        </div>
+    `;
+});
 
-        if (!data) return;
 
-        // 24 saat dolmuş mu?
-        if (Date.now() - data.time > DAY) {
-            delete feedbacks[code];
-            localStorage.setItem("feedbacks", JSON.stringify(feedbacks));
-            return;
-        }
-
-        // dolmamışsa teşekkür mesajı göster
-        box.innerHTML = `
-            <div class="feedback-title">
-                ✅ Geri bildiriminiz için teşekkürler!
-            </div>
-        `;
-    });
+function saveFeedback(code) {
+    localStorage.setItem("feedback_" + code, Date.now());
 }
-
-
 
 function setLang(l){currentLang=l;search.placeholder=text[l].search;render(errors)}
 
@@ -833,6 +831,14 @@ document.getElementById('toggleFavorites').onclick=()=>{document.getElementById(
 function goToError(code){const details=document.querySelectorAll('details');details.forEach(d=>{if(d.querySelector('summary').textContent===code){d.scrollIntoView({behavior:'smooth',block:'center'});d.open=true;}})}
 
 function copyError(code){const e=errors.find(err=>err.code===code);if(e){const textToCopy=`${e.code}\n${text[currentLang].reason}: ${e.reason[currentLang]}\n${text[currentLang].solution}: ${e.solution[currentLang]}`;navigator.clipboard.writeText(textToCopy);const msg=document.getElementById('copyMsg');msg.classList.add('show');setTimeout(()=>msg.classList.remove('show'),1500);}}
+
+function feedbackVote(code, box) {
+    localStorage.setItem("fb_" + code, Date.now());
+
+    box.innerHTML = "✅ Geri bildiriminiz için teşekkürler!";
+    box.classList.add("feedback-thanks");
+}
+
 </script>
 </body>
 </html>
