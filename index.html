@@ -897,29 +897,28 @@ function goToError(code){const details=document.querySelectorAll('details');deta
 
 function copyError(code){const e=errors.find(err=>err.code===code);if(e){const textToCopy=`${e.code}\n${text[currentLang].reason}: ${e.reason[currentLang]}\n${text[currentLang].solution}: ${e.solution[currentLang]}`;navigator.clipboard.writeText(textToCopy);const msg=document.getElementById('copyMsg');msg.classList.add('show');setTimeout(()=>msg.classList.remove('show'),1500);}}
 
-function feedbackVote(code, box) {
-    localStorage.setItem("fb_" + code, Date.now());
-
-    box.innerHTML = "✅ Geri bildiriminiz için teşekkürler!";
-    box.classList.add("feedback-thanks");
-}
-
-async function countSearchFS(code) {
-    const ref = doc(db, "searches", code);
-
-    try {
-        await updateDoc(ref, {
-            count: increment(1)
-        });
-    } catch {
-        await setDoc(ref, {
-            count: 1
-        });
-    }
-}
-
-
 </script>
+
+<script>
+async function countSearchFS(code) {
+  const ref = doc(db, "searches", code);
+
+  const snap = await getDoc(ref);
+
+  if (snap.exists()) {
+    await updateDoc(ref, {
+      count: increment(1)
+    });
+  } else {
+    await setDoc(ref, {
+      count: 1
+    });
+  }
+
+  console.log("search sayıldı:", code);
+}
+</script>
+
 
 <script type="module">
   // Import the functions you need from the SDKs you need
@@ -943,6 +942,8 @@ async function countSearchFS(code) {
   import {
   getFirestore,
   doc,
+  getDoc,
+  setDoc,
   updateDoc,
   increment
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
