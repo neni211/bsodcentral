@@ -917,6 +917,15 @@ async function countSearchFS(code) {
 
   console.log("search sayıldı:", code);
 }
+
+document.addEventListener("click", async (e) => {
+    const summary = e.target.closest("summary");
+    if (!summary) return;
+
+    const code = summary.textContent.trim();
+    await countViewFS(code);
+});
+
 </script>
 
 
