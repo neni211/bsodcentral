@@ -897,22 +897,6 @@ function goToError(code){const details=document.querySelectorAll('details');deta
 
 function copyError(code){const e=errors.find(err=>err.code===code);if(e){const textToCopy=`${e.code}\n${text[currentLang].reason}: ${e.reason[currentLang]}\n${text[currentLang].solution}: ${e.solution[currentLang]}`;navigator.clipboard.writeText(textToCopy);const msg=document.getElementById('copyMsg');msg.classList.add('show');setTimeout(()=>msg.classList.remove('show'),1500);}}
 
-async function countViewFS(code) {
-    const ref = doc(db, "views", code);
-
-    try {
-        await updateDoc(ref, {
-            count: increment(1)
-        });
-        console.log("VIEW +1:", code);
-    } catch (e) {
-        await setDoc(ref, {
-            count: 1
-        });
-        console.log("VIEW CREATED:", code);
-    }
-}
-
 </script>
 
 <script type="module">
@@ -968,7 +952,11 @@ async function countViewFS(code) {
   console.log("view sayıldı:", code);
 }
 
-/* 🖱️ SUMMARY TIKLAMA */
+/* 🌍 GLOBAL */
+window.countViewFS = countViewFS;
+window.countSearchFS = countSearchFS;
+
+/* 🖱️ SUMMARY */
 document.addEventListener("click", (e) => {
   const summary = e.target.closest("summary");
   if (!summary) return;
@@ -976,6 +964,7 @@ document.addEventListener("click", (e) => {
   const code = summary.textContent.trim();
   window.countViewFS(code);
 });
+
 
 </script>
 
