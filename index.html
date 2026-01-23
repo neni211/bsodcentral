@@ -720,8 +720,6 @@ function render(arr) {
 
     arr.forEach(e => {
 
-    countSearch(e.code);
-
         const category =
             e.risk === 'high' ? 'driver' :
             e.risk === 'mid'  ? 'gpu' :
@@ -744,8 +742,7 @@ function render(arr) {
 
         list.innerHTML += `
             <details>
-                <summary onclick="countView('${e.code}')">${e.code}</summary>
-
+                <summary>${e.code}</summary>
 
                 <span class="tag ${category}">
                     ${category.toUpperCase()}
@@ -776,14 +773,13 @@ function render(arr) {
                     👍 ${percent}% users found this helpful
                 </div>
 
- <div class="feedback-box">
-  <div class="feedback-title">Was this helpful?</div>
-  <div class="feedback-actions">
-    <button class="feedback-btn yes">👍 <span>Yes</span></button>
-    <button class="feedback-btn no">👎 <span>No</span></button>
-  </div>
-</div>
-
+                <div class="feedback-box">
+                    <div class="feedback-title">Was this helpful?</div>
+                    <div class="feedback-actions">
+                        <button class="feedback-btn yes">👍 <span>Yes</span></button>
+                        <button class="feedback-btn no">👎 <span>No</span></button>
+                    </div>
+                </div>
 
                 <button
                     class="favorite-btn"
@@ -803,9 +799,6 @@ function render(arr) {
 
 
 render(errors);
-
-renderTopStats();
-
 
 document.addEventListener("click", function (e) {
     const btn = e.target.closest(".feedback-btn");
@@ -911,40 +904,20 @@ function feedbackVote(code, box) {
     box.classList.add("feedback-thanks");
 }
 
-function renderTopStats() {
-    const box = document.getElementById("topErrors");
-    if (!box) return;
+async function countSearchFS(code) {
+    const ref = doc(db, "searches", code);
 
-    const views = JSON.parse(localStorage.getItem("bsod_views")) || {};
-
-    const sorted = Object.entries(views)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 5);
-
-    box.innerHTML = "";
-
-    if (sorted.length === 0) {
-        box.innerHTML = "<div style='font-size:12px;opacity:.6'>Henüz veri yok</div>";
-        return;
+    try {
+        await updateDoc(ref, {
+            count: increment(1)
+        });
+    } catch {
+        await setDoc(ref, {
+            count: 1
+        });
     }
-
-    sorted.forEach(([code, count]) => {
-        const div = document.createElement("div");
-        div.className = "top-stats-item";
-        div.textContent = `${code} (${count})`;
-
-        div.onclick = () => goToError(code);
-
-        box.appendChild(div);
-    });
 }
 
-
-function countView(code) {
-    let views = JSON.parse(localStorage.getItem("bsod_views")) || {};
-    views[code] = (views[code] || 0) + 1;
-    localStorage.setItem("bsod_views", JSON.stringify(views));
-}
 
 </script>
 
@@ -967,9 +940,25 @@ function countView(code) {
     measurementId: "G-REBSZB9F4M"
   };
 
+  import {
+  getFirestore,
+  doc,
+  updateDoc,
+  increment
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
+
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
   const analytics = getAnalytics(app);
+
+window.db = db;
+window.doc = doc;
+window.getDoc = getDoc;
+window.setDoc = setDoc;
+window.updateDoc = updateDoc;
+window.increment = increment;
 </script>
 
 </body>
