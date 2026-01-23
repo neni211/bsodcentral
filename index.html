@@ -897,58 +897,28 @@ function goToError(code){const details=document.querySelectorAll('details');deta
 
 function copyError(code){const e=errors.find(err=>err.code===code);if(e){const textToCopy=`${e.code}\n${text[currentLang].reason}: ${e.reason[currentLang]}\n${text[currentLang].solution}: ${e.solution[currentLang]}`;navigator.clipboard.writeText(textToCopy);const msg=document.getElementById('copyMsg');msg.classList.add('show');setTimeout(()=>msg.classList.remove('show'),1500);}}
 
-</script>
+async function countViewFS(code) {
+    const ref = doc(db, "views", code);
 
-<script>
-async function countSearchFS(code) {
-  const ref = doc(db, "searches", code);
-
-  const snap = await getDoc(ref);
-
-  if (snap.exists()) {
-    await updateDoc(ref, {
-      count: increment(1)
-    });
-  } else {
-    await setDoc(ref, {
-      count: 1
-    });
-  }
-
-  console.log("search sayıldı:", code);
+    try {
+        await updateDoc(ref, {
+            count: increment(1)
+        });
+        console.log("VIEW +1:", code);
+    } catch (e) {
+        await setDoc(ref, {
+            count: 1
+        });
+        console.log("VIEW CREATED:", code);
+    }
 }
 
-document.addEventListener("click", async (e) => {
-    const summary = e.target.closest("summary");
-    if (!summary) return;
-
-    const code = summary.textContent.trim();
-    await countViewFS(code);
-});
-
 </script>
 
-
 <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyBzllnsB7YpBo3zpAhJCX2syPMlXlZumeY",
-    authDomain: "bsodcentral-23af4.firebaseapp.com",
-    projectId: "bsodcentral-23af4",
-    storageBucket: "bsodcentral-23af4.firebasestorage.app",
-    messagingSenderId: "460072681940",
-    appId: "1:460072681940:web:b08bb35536798848acd641",
-    measurementId: "G-REBSZB9F4M"
-  };
-
-  import {
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-analytics.js";
+import {
   getFirestore,
   doc,
   getDoc,
@@ -957,19 +927,58 @@ document.addEventListener("click", async (e) => {
   increment
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
+const firebaseConfig = {
+  apiKey: "AIzaSyBzllnsB7YpBo3zpAhJCX2syPMlXlZumeY",
+  authDomain: "bsodcentral-23af4.firebaseapp.com",
+  projectId: "bsodcentral-23af4",
+  storageBucket: "bsodcentral-23af4.firebasestorage.app",
+  messagingSenderId: "460072681940",
+  appId: "1:460072681940:web:b08bb35536798848acd641",
+  measurementId: "G-REBSZB9F4M"
+};
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const analytics = getAnalytics(app);
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+getAnalytics(app);
 
-window.db = db;
-window.doc = doc;
-window.getDoc = getDoc;
-window.setDoc = setDoc;
-window.updateDoc = updateDoc;
-window.increment = increment;
+/* 🔍 SEARCH COUNT */
+async function countSearchFS(code) {
+  const ref = doc(db, "searches", code);
+  const snap = await getDoc(ref);
+
+  if (snap.exists()) {
+    await updateDoc(ref, { count: increment(1) });
+  } else {
+    await setDoc(ref, { count: 1 });
+  }
+
+  console.log("search sayıldı:", code);
+}
+
+/* 👁️ VIEW COUNT */
+async function countViewFS(code) {
+  const ref = doc(db, "views", code);
+
+  try {
+    await updateDoc(ref, { count: increment(1) });
+  } catch {
+    await setDoc(ref, { count: 1 });
+  }
+
+  console.log("view sayıldı:", code);
+}
+
+/* 🖱️ SUMMARY TIKLAMA */
+document.addEventListener("click", (e) => {
+  const summary = e.target.closest("summary");
+  if (!summary) return;
+
+  const code = summary.textContent.trim();
+  countViewFS(code);
+});
+
 </script>
+
 
 </body>
 </html>
