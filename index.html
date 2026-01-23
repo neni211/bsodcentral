@@ -956,14 +956,21 @@ async function countViewFS(code) {
 window.countViewFS = countViewFS;
 window.countSearchFS = countSearchFS;
 
-/* 🖱️ SUMMARY */
+/* 🖱️ SUMMARY (spam önlemeli) */
+const viewed = new Set();
+
 document.addEventListener("click", (e) => {
   const summary = e.target.closest("summary");
   if (!summary) return;
 
   const code = summary.textContent.trim();
+
+  if (viewed.has(code)) return; // aynı oturumda tekrar sayma
+  viewed.add(code);
+
   window.countViewFS(code);
 });
+
 
 
 </script>
